@@ -71,7 +71,17 @@ class Reference(fields.Field):
         # Only return the pk of the document for serialization
         if value is None:
             return missing
-        return str(value.pk) if isinstance(value.pk, bson.ObjectId) else value.pk
+
+        # Create the schema at serialize time to be dynamic
+        from marshmallow_mongoengine.schema import ModelSchema
+
+        class NestedSchema(ModelSchema):
+            class Meta:
+                model = type(value)
+
+        data = NestedSchema().dump(value)
+
+        return data
 
 
 class GenericReference(fields.Field):

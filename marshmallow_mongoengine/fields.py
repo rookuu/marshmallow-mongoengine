@@ -154,9 +154,7 @@ class GenericEmbeddedDocument(fields.Field):
 
             class Meta:
                 model = type(value)
-        data, errors = NestedSchema().dump(value)
-        if errors:
-            raise ValidationError(errors)
+        data = NestedSchema().dump(value)
         return data
 
 
@@ -175,9 +173,7 @@ class Map(fields.Field):
         func = getattr(self.schema, action)
         total = {}
         for k, v in value.items():
-            data, errors = func(v)
-            if errors:
-                raise ValidationError(errors)
+            data = func(v)
             total[k] = data
         return total
 

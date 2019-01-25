@@ -74,6 +74,8 @@ class Reference(fields.Field):
 
         # Create the schema at serialize time to be dynamic
         from marshmallow_mongoengine.schema import ModelSchema
+        
+        print(type(value))
 
         class NestedSchema(ModelSchema):
             class Meta:

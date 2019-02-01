@@ -75,9 +75,12 @@ class Reference(fields.Field):
         # Create the schema at serialize time to be dynamic
         from marshmallow_mongoengine.schema import ModelSchema
 
-        class NestedSchema(ModelSchema):
-            class Meta:
-                model = type(value)
+        try:
+            class NestedSchema(ModelSchema):
+                class Meta:
+                    model = type(value)
+        except:
+            return "<Deleted>"
 
         data = NestedSchema().dump(value)
 

@@ -71,6 +71,39 @@ class Reference(fields.Field):
         # Only return the pk of the document for serialization
         if value is None:
             return missing
+        
+        return str(value.pk) if isinstance(value.pk, bson.ObjectId) else value.pk
+
+    
+class EmbeddedReference(fields.Field):
+
+    """
+    Marshmallow custom field
+    """
+
+    def __init__(self, document_type_obj, *args, **kwargs):
+        self.document_type_obj = document_type_obj
+        super(Reference, self).__init__(*args, **kwargs)
+
+    @property
+    def document_type(self):
+        if isinstance(self.document_type_obj, str):
+            self.document_type_obj = get_document(self.document_type_obj)
+        return self.document_type_obj
+
+    def _deserialize(self, value, attr, data):
+        document_type = self.document_type
+        try:
+            return document_type.objects.get(pk=value)
+        except (document_type.DoesNotExist, MongoValidationError, ValueError, TypeError):
+            raise ValidationError('unknown document %s `%s`' %
+                                  (document_type._class_name, value))
+        return value
+
+    def _serialize(self, value, attr, obj):
+        # Only return the pk of the document for serialization
+        if value is None:
+            return missing
 
         # Create the schema at serialize time to be dynamic
         from marshmallow_mongoengine.schema import ModelSchema
@@ -85,6 +118,7 @@ class Reference(fields.Field):
         data = NestedSchema().dump(value)
 
         return data
+
 
 
 class GenericReference(fields.Field):

@@ -42,7 +42,7 @@ class Point(fields.Field):
         )
 
 
-class StaticReference(fields.Field):
+class Reference(fields.Field):
 
     """
     Marshmallow custom field to map with :class Mongoengine.ReferenceField:
@@ -75,7 +75,7 @@ class StaticReference(fields.Field):
         return str(value.pk) if isinstance(value.pk, bson.ObjectId) else value.pk
 
     
-class Reference(fields.Field):
+class EmbeddedReference(fields.Field):
 
     """
     Marshmallow custom field

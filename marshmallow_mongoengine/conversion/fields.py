@@ -69,16 +69,14 @@ class ReferenceBuilder(MetaFieldBuilder):
 
 
 class GenericReferenceBuilder(MetaFieldBuilder):
-    BASE_AVAILABLE_PARAMS = tuple([p for p in MetaFieldBuilder.BASE_AVAILABLE_PARAMS
-                             if p is not params.ChoiceParam])
     AVAILABLE_PARAMS = ()
-    MARSHMALLOW_FIELD_CLS = ma_fields.GenericReference
+    MARSHMALLOW_FIELD_CLS = ma_fields.EmbeddedReference
 
-    def build_marshmallow_field(self, **kwargs):
-        # Special handle for the choice field given it represent the
-        # reference's document class
-        kwargs['choices'] = getattr(self.mongoengine_field, 'choices', None)
-        return super(GenericReferenceBuilder, self).build_marshmallow_field(**kwargs)
+    def _get_marshmallow_field_cls(self):
+        return functools.partial(
+            self.MARSHMALLOW_FIELD_CLS,
+            self.mongoengine_field.document_type
+        )
 
 
 class EmbeddedDocumentBuilder(MetaFieldBuilder):

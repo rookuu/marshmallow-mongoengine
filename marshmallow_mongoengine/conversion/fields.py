@@ -94,6 +94,7 @@ class EmbeddedDocumentBuilder(MetaFieldBuilder):
         class NestedSchema(base_nested_schema_cls):
             class Meta:
                 model = self.mongoengine_field.document_type
+                model_skip_values = [None]
 
         return functools.partial(
             self.MARSHMALLOW_FIELD_CLS,
